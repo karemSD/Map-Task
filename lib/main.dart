@@ -2,6 +2,7 @@
 
 import 'package:apitask/views/google_map_view.dart';
 import 'package:apitask/views/login_or_rigster_view.dart';
+import 'package:apitask/views/login_view.dart';
 import 'package:apitask/views/time_line_view.dart';
 
 import 'package:flutter/material.dart';
@@ -21,7 +22,9 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       getPages: [
         GetPage(name: GoogleMapView.id, page: () => const GoogleMapView()),
-        GetPage(name: TimeLine.id, page: () => const TimeLine())
+        GetPage(name: TimeLine.id, page: () => const TimeLine()),
+        GetPage(name: LoginOrRigsterView.id, page: () => const LoginOrRigsterView()),
+
       ],
       title: 'Flutter Map Demo',
       debugShowCheckedModeBanner: false,

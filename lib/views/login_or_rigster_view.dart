@@ -6,7 +6,7 @@ import '../widgets/rigster_view_body.dart';
 
 class LoginOrRigsterView extends StatefulWidget {
   const LoginOrRigsterView({super.key});
-
+  static String id = "/LoginOrRigsterView";
   @override
   State<LoginOrRigsterView> createState() => _LoginOrRigsterPageState();
 }

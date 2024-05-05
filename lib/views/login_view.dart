@@ -5,6 +5,7 @@ import 'package:apitask/views/time_line_view.dart';
 import 'package:apitask/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart';
 import '../utils/global/values.dart';
 import '../widgets/custom_text_field_write.dart';
 import '../widgets/my_button.dart';
@@ -14,9 +15,9 @@ import 'package:email_validator/email_validator.dart';
 import 'google_map_view.dart';
 
 class LoginView extends StatefulWidget {
-  Function()? onTap;
-  LoginView({super.key, required this.onTap});
-
+ final Function()? onTap;
+  const LoginView({super.key,  this.onTap});
+  static String id = "/LoginView";
   @override
   State<LoginView> createState() => _LoginViewState();
 }

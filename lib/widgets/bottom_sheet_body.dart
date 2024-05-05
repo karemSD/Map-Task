@@ -7,12 +7,13 @@ import 'package:flutter/material.dart';
 import '../models/location_api_model.dart';
 
 class BottomSheetBody extends StatelessWidget {
-  BottomSheetBody({super.key, required this.locationApiModel});
+  BottomSheetBody(
+      {super.key, required this.locationApiModel, required this.onDirections});
   final ValueNotifier<int> _selectedButtonIndex = ValueNotifier<int>(-1);
   final ValueNotifier<IconData> _isSaveButtonSelected =
       ValueNotifier<IconData>(Icons.bookmark_border);
   final LocationApiModel locationApiModel;
-
+  final VoidCallback onDirections;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -36,7 +37,10 @@ class BottomSheetBody extends StatelessWidget {
                 BottomSheetButtonItem(
                     selectedButtonIndex: _selectedButtonIndex,
                     index: 0,
-                    onPressed: () {},
+                    onPressed: () async {
+                      onDirections();
+                      Navigator.pop(context);
+                    },
                     icon: Icons.directions,
                     title: "Directions",
                     iconTextColor: Colors.blue,

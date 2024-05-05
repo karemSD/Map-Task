@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'package:apitask/models/location_api_model.dart';
+import 'package:apitask/models/place_details_model/place_details_model.dart';
 import 'package:apitask/utils/global/values.dart';
 import 'package:apitask/widgets/bottom_sheet_body.dart';
 import 'package:flutter/material.dart';
@@ -93,7 +94,7 @@ class GoogleMapViewState extends State<GoogleMapView> {
                         tappedPoint.longitude.toStringAsFixed(7),
                       ),
                     );
-                 
+
                     LocationApiModel locationApiModel = LocationApiModel(
                         id: 0,
                         name:
@@ -110,7 +111,13 @@ class GoogleMapViewState extends State<GoogleMapView> {
                       context: context,
                       builder: (context) {
                         return BottomSheetBody(
-                            locationApiModel: locationApiModel);
+                            locationApiModel: locationApiModel,
+                            onDirections: () async {
+                              await showRoute(tappedPoint, currentPosition);
+                              if (mounted) {
+                                setState(() {});
+                              }
+                            });
                       }, // Replace with your container definition
                     );
                     // print(placemarks);
@@ -184,16 +191,7 @@ class GoogleMapViewState extends State<GoogleMapView> {
                       textEditingController.clear();
                       places.clear();
                       sesstionToken = null;
-                      destintion = LatLng(
-                          placeDetailsModel.geometry!.location!.lat!,
-                          placeDetailsModel.geometry!.location!.lng!);
-                      List<LatLng> points = await routeService
-                          .getPolylinePoints(currentPosition, destintion);
-                      mapViewService.addMarkerFromPlaceDetails(
-                          placeDetailsModel: placeDetailsModel,
-                          markerSet: markers,
-                          icon: customMarkerStarIcon);
-                      updatePolylineSet(points);
+                      await showRouteWithMarker(placeDetailsModel);
                       if (mounted) {
                         setState(() {});
                       }
@@ -208,6 +206,24 @@ class GoogleMapViewState extends State<GoogleMapView> {
         ],
       ),
     );
+  }
+
+  Future<void> showRouteWithMarker(PlaceDetailsModel placeDetailsModel) async {
+    destintion = LatLng(placeDetailsModel.geometry!.location!.lat!,
+        placeDetailsModel.geometry!.location!.lng!);
+    List<LatLng> points =
+        await routeService.getPolylinePoints(currentPosition, destintion);
+    mapViewService.addMarkerFromPlaceDetails(
+        placeDetailsModel: placeDetailsModel,
+        markerSet: markers,
+        icon: customMarkerStarIcon);
+    updatePolylineSet(points);
+  }
+
+  Future<void> showRoute(LatLng destintion, LatLng currentPosition) async {
+    List<LatLng> points =
+        await routeService.getPolylinePoints(currentPosition, destintion);
+    updatePolylineSet(points);
   }
 
   updateCurrentLocation() {

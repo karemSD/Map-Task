@@ -1,6 +1,8 @@
 import 'package:apitask/utils/global/values.dart';
+import 'package:apitask/views/login_or_rigster_view.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 class CutsomNavigationBar extends StatefulWidget {
   const CutsomNavigationBar({super.key, required this.updateView});
@@ -66,6 +68,10 @@ class _MyWidgetState extends State<CutsomNavigationBar> {
       animationDuration: const Duration(milliseconds: 300),
       onDestinationSelected: (index) {
         _onItemTapped(index);
+        if (index == 2) {
+          accessToken = "";
+          Get.offAndToNamed(LoginOrRigsterView.id);
+        }
         widget.updateView(index);
       },
     );
