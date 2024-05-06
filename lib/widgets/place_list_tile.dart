@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class PlaceListTile extends StatelessWidget {
   final String placeName;
   final String longLat;
+ final VoidCallback onTap;
+
 
   const PlaceListTile({
     super.key,
     required this.placeName,
-    required this.longLat,
+    required this.longLat, required this.onTap,
   });
 
   @override
@@ -17,6 +19,7 @@ class PlaceListTile extends StatelessWidget {
       decoration: BoxDecoration(
           backgroundBlendMode: BlendMode.color, color: Colors.grey.shade300),
       child: ListTile(
+        onTap: onTap,
         shape: BeveledRectangleBorder(
           borderRadius: BorderRadius.circular(0),
           side: BorderSide(

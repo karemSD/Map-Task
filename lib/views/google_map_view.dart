@@ -24,8 +24,9 @@ import '../widgets/custom_text_fiield.dart';
 import '../widgets/navigation_bar.dart';
 
 class GoogleMapView extends StatefulWidget {
-  const GoogleMapView({super.key});
+  const GoogleMapView({super.key, this.savedLocation});
   static String id = "/GoogleMapView";
+  final LocationApiModel? savedLocation;
   @override
   State<GoogleMapView> createState() => GoogleMapViewState();
 }
@@ -54,6 +55,10 @@ class GoogleMapViewState extends State<GoogleMapView> {
 
     initlizeVariables();
     initMarkersIcon();
+    if (widget.savedLocation != null) {
+      addMarkerAtSavedLocation();
+    }
+
     fetchPredicitions();
     dev.log("GoogleMapView");
   }
@@ -101,25 +106,8 @@ class GoogleMapViewState extends State<GoogleMapView> {
                             "${placemarks[0].country} , ${placemarks[0].administrativeArea} ,${placemarks[0].subAdministrativeArea} , ${placemarks[0].street}",
                         longLat:
                             "${tappedPoint.latitude},${tappedPoint.longitude}");
-                    showModalBottomSheet(
-                      elevation: .2,
-                      backgroundColor: Colors.white,
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      enableDrag: true,
-                      showDragHandle: true,
-                      scrollControlDisabledMaxHeightRatio: .2,
-                      context: context,
-                      builder: (context) {
-                        return BottomSheetBody(
-                            locationApiModel: locationApiModel,
-                            onDirections: () async {
-                              await showRoute(tappedPoint, currentPosition);
-                              if (mounted) {
-                                setState(() {});
-                              }
-                            });
-                      }, // Replace with your container definition
-                    );
+                    showLocationButtomSheet(locationApiModel, tappedPoint);
+
                     // print(placemarks);
                   },
                 ),
@@ -235,6 +223,7 @@ class GoogleMapViewState extends State<GoogleMapView> {
             LatLng(locationData.latitude!, locationData.longitude!);
         currentPosition =
             LatLng(currentLocation.longitude, currentLocation.longitude);
+        globalcurrentPosition = currentPosition;
         Marker userMarker = Marker(
           markerId: const MarkerId("user_marker"),
           infoWindow: const InfoWindow(snippet: "", title: "الموقع الحالي"),
@@ -274,9 +263,15 @@ class GoogleMapViewState extends State<GoogleMapView> {
 
   void initlizeVariables() {
     mapViewService = MapViewService();
-    cameraPosition = const CameraPosition(
-      target: LatLng(0, 0),
-    );
+    if (widget.savedLocation == null) {
+      cameraPosition = CameraPosition(target: const LatLng(0, 0));
+    } else {
+      List<String> coordinates = widget.savedLocation!.longLat.split(',');
+      double latitude = double.parse(coordinates[0]);
+      double longitude = double.parse(coordinates[1]);
+      cameraPosition = CameraPosition(target: LatLng(latitude, longitude));
+    }
+
     textEditingController = TextEditingController();
     goolgeMapsPlaceService = GoolgeMapsPlaceService();
     uuid = const Uuid();
@@ -310,5 +305,52 @@ class GoogleMapViewState extends State<GoogleMapView> {
     if (mounted) {
       setState(() {});
     }
+  }
+
+  void addMarkerAtSavedLocation() async {
+    List<String> coordinates = widget.savedLocation!.longLat.split(',');
+    double latitude = double.parse(coordinates[0]);
+    double longitude = double.parse(coordinates[1]);
+    Marker marker = Marker(
+      markerId: MarkerId("savedLocationMarker"),
+      position: LatLng(latitude, longitude),
+      infoWindow: InfoWindow(
+          title: widget.savedLocation!.name,
+          snippet: widget.savedLocation!.longLat),
+      onTap: () {
+        showLocationButtomSheet(
+          widget.savedLocation!,
+          LatLng(latitude, longitude),
+        );
+      },
+    );
+    List<LatLng> points = await routeService.getPolylinePoints(
+        globalcurrentPosition!, LatLng(latitude, longitude));
+    updatePolylineSet(points);
+    markers.add(marker);
+    setState(() {});
+  }
+
+  showLocationButtomSheet(
+      LocationApiModel locationApiModel, LatLng tappedPoint) {
+    showModalBottomSheet(
+      elevation: .2,
+      backgroundColor: Colors.white,
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      enableDrag: true,
+      showDragHandle: true,
+      scrollControlDisabledMaxHeightRatio: .2,
+      context: context,
+      builder: (context) {
+        return BottomSheetBody(
+            locationApiModel: locationApiModel,
+            onDirections: () async {
+              await showRoute(tappedPoint, currentPosition);
+              if (mounted) {
+                setState(() {});
+              }
+            });
+      }, // Replace with your container definition
+    );
   }
 }

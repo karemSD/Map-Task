@@ -6,6 +6,9 @@ import 'package:apitask/utils/services/locations_api_service.dart';
 import 'package:apitask/widgets/place_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import 'google_map_view.dart';
 
 class SavedView extends StatelessWidget {
   const SavedView({super.key});
@@ -14,11 +17,17 @@ class SavedView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(
+          height: 20,
+        ),
         const Center(
-          child: Text('Saved Screen'),
+          child: Text(
+            'Saved Places 📖',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+          ),
         ),
         const SizedBox(
-          height: 40,
+          height: 20,
         ),
         FutureBuilder<List<LocationApiModel>?>(
           future: LocationsApiService.fetchData(
@@ -52,6 +61,23 @@ class SavedView extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: PlaceListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Scaffold(
+                                    appBar: AppBar(
+                                      backgroundColor: appColorPrimary,
+                                      centerTitle: true,
+                                      title: const Text("Find"),
+                                    ),
+                                    body: GoogleMapView(
+                                      savedLocation: place,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                             placeName: place.name,
                             longLat: place.longLat,
                           ),
@@ -68,25 +94,6 @@ class SavedView extends StatelessWidget {
             );
           },
         )
-        // Expanded(
-        //   child: ListView.builder(
-        //     itemCount: 6,
-        //     itemBuilder: (context, index) {
-        //       return const Column(
-        //         children: [
-        //           PlaceListTile(
-        //               placeName: "placeName",
-        //               latitude: 33.43545454,
-        //               longitude: 33.43545454,
-        //               details: "Famous suspension bridge in San Francisco"),
-        //           SizedBox(
-        //             height: 10,
-        //           )
-        //         ],
-        //       );
-        //     },
-        //   ),
-        // )
       ],
     );
   }
